@@ -152,14 +152,14 @@ abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,Subs
                         rightStr: String,   //右侧确认提示文字
                         mListener: OnAlertDialogListener){
         if(mAlertDialog == null) mAlertDialog = AlertDialog.Builder(this)
-        mAlertDialog!!.setMessage(messageStr)
-                .setPositiveButton(rightStr, DialogInterface.OnClickListener { dialog, which ->
+        mAlertDialog?.setMessage(messageStr)
+                ?.setPositiveButton(rightStr, DialogInterface.OnClickListener { dialog, which ->
                     dialog.dismiss()
                     mListener.onNegative() })
-                .setNegativeButton(cancelStr,DialogInterface.OnClickListener { dialog, which ->
+                ?.setNegativeButton(cancelStr,DialogInterface.OnClickListener { dialog, which ->
                     dialog.dismiss()
                     mListener.onNegative()
-                }).show()
+                })?.show()
     }
 
     /**
@@ -168,19 +168,19 @@ abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,Subs
     fun showProgressDialog(messageStr: String?){
         if(mProgressDialog == null) {
             mProgressDialog = ProgressDialog(this)
-            mProgressDialog!!.isIndeterminate = true
-            mProgressDialog!!.setCancelable(true)
+            mProgressDialog?.isIndeterminate = true
+            mProgressDialog?.setCancelable(true)
         }
-        if(TextUtils.isEmpty(messageStr)) mProgressDialog!!.setMessage("加载中...")
-        else mProgressDialog!!.setMessage(messageStr)
+        if(TextUtils.isEmpty(messageStr)) mProgressDialog?.setMessage("加载中...")
+        else mProgressDialog?.setMessage(messageStr)
         if(mProgressDialog!!.isShowing)
-            mProgressDialog!!.dismiss()
-        mProgressDialog!!.show()
+            mProgressDialog?.dismiss()
+        mProgressDialog?.show()
     }
 
     fun dissmissProgressDialog(){
         if(mProgressDialog!!.isShowing)
-            mProgressDialog!!.dismiss()
+            mProgressDialog?.dismiss()
     }
 
     /**
@@ -188,11 +188,11 @@ abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,Subs
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if(keyCode == KeyEvent.KEYCODE_BACK){
-            //拦截系统返回键单击事件
+            //拦截系统返回键
             mOnClickBackListener = getOnBackClickListener()
             if(mOnClickBackListener != null) {
-                //触发我们自己的返回键监听事件
-                mOnClickBackListener!!.onClickBack()
+                //触发我们自己的返回键监听
+                mOnClickBackListener?.onClickBack()
                 return true
             }
             finish()

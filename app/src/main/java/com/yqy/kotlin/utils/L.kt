@@ -7,7 +7,7 @@ import android.util.Log
  * Created by yanqy on 2017/4/18.
  */
 
-object L {
+ object L {
 
     /**
      * 是否展示，在不需要的时候设置为false
