@@ -16,7 +16,7 @@ class MainActivity : BaseActivity() {
     override fun initData() {
     }
 
-    override fun getOnBackClickListener(): OnClickBackListener = null!!
+    override fun getOnBackClickListener(): OnClickBackListener = mOnClickBackListener
 
     override fun onClick(v: View?) {
     }

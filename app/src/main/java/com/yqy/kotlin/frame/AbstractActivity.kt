@@ -36,7 +36,11 @@ abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,Subs
     var pageNum: Int = 20 //分页 每页数量
     var isLoadMore: Boolean = true //是否可以加载更多
 
-    var mOnClickBackListener: OnClickBackListener? = null
+    var mOnClickBackListener: OnClickBackListener = object : OnClickBackListener {
+        override fun onClickBack() {
+            finish()
+        }
+    }
 
     /** 预备布局contenView id */
     protected abstract fun preView(): Int
