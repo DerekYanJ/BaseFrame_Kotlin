@@ -19,22 +19,85 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.yqy.kotlin.R
+import com.yqy.kotlin.http.ProgressSubscriber
 import com.yqy.kotlin.http.SubscriberResultListener
 import com.yqy.kotlin.listener.OnAlertDialogListener
 import com.yqy.kotlin.listener.OnClickBackListener
+import com.yqy.kotlin.utils.L
 import com.yqy.kotlin.utils.glide.GlideCircleTransform
+import rx.Subscriber
 
 /**
  * acivity基类
  * Created by DerekYan on 2017/7/12.
  */
-abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,SubscriberResultListener<Object>{
+abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,SubscriberResultListener<Any>{
     var mProgressDialog: ProgressDialog? = null
     var mAlertDialog: AlertDialog.Builder? = null
     var mContext: Context? = null
 
     var pageNum: Int = 20 //分页 每页数量
     var isLoadMore: Boolean = true //是否可以加载更多
+
+    /** 请求的对象的结合 */
+    var mSubscriberMap: MutableMap<Int, Subscriber<Any>>? = HashMap()
+
+    /**
+     * 请求集合
+     */
+    open fun addSubscriber(subscriber: ProgressSubscriber<Any>): Subscriber<Any> {
+        if(mSubscriberMap == null) return subscriber
+        //请求id
+        val requestId = subscriber.requestId
+        if(mSubscriberMap?.containsKey(requestId)!!){
+            if(mSubscriberMap!![requestId]?.isUnsubscribed!!)
+            //如果没有取消订阅 则取消订阅
+                mSubscriberMap!![requestId]?.unsubscribe()
+        }
+        mSubscriberMap?.put(requestId, subscriber)
+        return subscriber
+    }
+
+    /**
+     * 清空subscriber
+     */
+    fun clearSubscriber(){
+        if(mSubscriberMap == null) return
+        try {
+            for ((key, _) in mSubscriberMap!!) {
+                var subscriber: Subscriber<Any> = mSubscriberMap!![key]!!
+                if(subscriber.isUnsubscribed)
+                //取消订阅
+                    subscriber.unsubscribe()
+            }
+        } catch(e: Exception) {
+            L.e(e.printStackTrace().toString())
+        }
+        //非空 清空
+        if(mSubscriberMap != null) mSubscriberMap?.clear()
+    }
+
+    /**
+     * 请求结束后移除对应Subscriber
+     */
+    fun removeSubscriber(requestId: Int){
+        if(mSubscriberMap == null) return
+        try {
+            if(mSubscriberMap?.containsKey(requestId)!!){
+                if(mSubscriberMap!![requestId]?.isUnsubscribed!!)
+                //取消订阅
+                    mSubscriberMap!![requestId]?.unsubscribe()
+            }
+        } catch(e: Exception) {
+            L.e(e.printStackTrace().toString())
+        }
+    }
+
+    override fun onDestroy() {
+        //清空
+        clearSubscriber()
+        super.onDestroy()
+    }
 
     var mOnClickBackListener: OnClickBackListener = object : OnClickBackListener {
         override fun onClickBack() {
@@ -66,11 +129,13 @@ abstract class AbstractActivity : AppCompatActivity(), View.OnClickListener,Subs
     fun <T> doData(data: T, id: Int){}
     fun <T> doData(data: T, id: Int, qid: String){}
 
-    override fun onNext(t: Object, requestId: Int) {
+    override fun onNext(t: Any, requestId: Int) {
+        removeSubscriber(requestId)
         doData(t,requestId)
     }
 
     override fun onError(errorCode: Int, msg: String, requestId: Int) {
+        removeSubscriber(requestId)
         if (msg.indexOf("session") != -1 || requestId == 1001) {
             //登录信息超时
             //            Intent intent = new Intent(this,LoginActivity.class);
