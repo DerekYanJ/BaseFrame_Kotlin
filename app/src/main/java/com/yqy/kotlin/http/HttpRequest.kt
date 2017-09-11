@@ -46,7 +46,7 @@ object HttpRequest{
             val builder = chain.request().newBuilder()
             val mRequest = chain.request().newBuilder()
                     .header("User-Agent", "android/" +
-                            App.VERSIONNAME + "(" +
+                            App().VERSIONNAME + "(" +
                             DeviceUtils.getSDKVersion() + ";" +
                             DeviceUtils.getModel() + ")")
                     .header("Cookie", "SSOID=" + SPUtil.getInstance().read("sessionid", ""))

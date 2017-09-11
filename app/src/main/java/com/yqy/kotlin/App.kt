@@ -7,7 +7,7 @@ import com.blankj.utilcode.utils.AppUtils
  *
  * Created by DerekYan on 2017/7/13.
  */
-object App : Application() {
+class App : Application() {
     var VERSIONNAME = ""
 
     override fun onCreate() {
